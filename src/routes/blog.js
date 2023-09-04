@@ -12,7 +12,7 @@ const router = express.Router();
 router.post("/", auth, async (req, res) => {
   const { error } = validateBlogPost(req.body);
 
-  if (error) return res.status(400).json({error: error.details[0].message});
+  if (error) return res.status(400).json({ error: error.details[0].message });
 
   const blog = new BlogPost({
     title: req.body.title,
@@ -25,13 +25,13 @@ router.post("/", auth, async (req, res) => {
 
   await blog.save();
 
-  res.send(blog);
+  res.json({ data: blog });
 });
 
 router.get("/", auth, async (req, res) => {
   const blogs = await BlogPost.find().catch((err) => console.log(err.message));
 
-  res.send(blogs);
+  res.json({ data: blogs });
 });
 
 router.get("/:id", auth, async (req, res) => {
@@ -42,13 +42,13 @@ router.get("/:id", auth, async (req, res) => {
   if (!blog)
     return res.status(404).json({ error: "No blog with the given id" });
 
-  res.send(blog);
+  res.json({ data: blog });
 });
 
 router.put("/:id", auth, async (req, res) => {
   const { error } = validateUpdateBlogPost(req.body);
 
-  if (error) return res.status(400).json({error: error.details[0].message});
+  if (error) return res.status(400).json({ error: error.details[0].message });
 
   const blog = await BlogPost.findByIdAndUpdate(
     req.params.id,
@@ -65,7 +65,7 @@ router.put("/:id", auth, async (req, res) => {
   if (!blog)
     return res.status(404).json({ error: "No blog with the given id" });
 
-  res.send(blog);
+  res.json({ data: blog });
 });
 
 router.delete("/:id", auth, async (req, res) => {
@@ -78,7 +78,7 @@ router.delete("/:id", auth, async (req, res) => {
       .status(404)
       .json({ error: "No blog with the given Id or Can't delete the bblog" });
 
-  res.status(201).send("Deleted Successfully");
+  res.status(201).json({ message: "Deleted Successfully" });
 });
 
 module.exports = router;
