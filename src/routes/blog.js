@@ -12,7 +12,7 @@ const router = express.Router();
 router.post("/", auth, async (req, res) => {
   const { error } = validateBlogPost(req.body);
 
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).json({error: error.details[0].message});
 
   const blog = new BlogPost({
     title: req.body.title,
@@ -48,7 +48,7 @@ router.get("/:id", auth, async (req, res) => {
 router.put("/:id", auth, async (req, res) => {
   const { error } = validateUpdateBlogPost(req.body);
 
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) return res.status(400).json({error: error.details[0].message});
 
   const blog = await BlogPost.findByIdAndUpdate(
     req.params.id,
