@@ -60,4 +60,13 @@ router.post('/signup', async (req, res) => {
     
 })
 
+router.delete('/:id', async (req, res) => {
+
+    const user = await User.findByIdAndRemove(req.params.id).catch(err => console.log(err.message))
+
+    if (!user) return res.status(404).send('No User with given Id')
+    
+    res.send(user)
+})
+
 module.exports = router
