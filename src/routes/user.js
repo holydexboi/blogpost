@@ -1,20 +1,47 @@
 const express = require('express')
-const User = require('../models/user')
+const {User, validateUserLogin, validateUserRegistration} = require('../models/user')
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const _ = require('lodash')
+const config = require('config')
 
 const router = express.Router()
 
-router.post('/', async (req, res) => {
-    if (!req.body.email) return res.status(400).send('Email not define')
-    
-    if (!req.body.password) return res.status(400).send('Password not define')
+router.post('/login', async (req, res) => {
 
-    User.signin({email: req.body.email, password: req.body.password})
-        .then(token => {
-            res.header('x-auth-token', token).send('Ok');
-        })
-        .catch(error => {
-        res.status(500).send(error.message)
-    })
+    const { error } = validateUserLogin(req.body)
+    
+    if (error) return res.status(400).send(error.details[0].message)
+
+    let user = await User.findOne({ email: req.body.email }).catch(err => console.log(err.message))
+    if(!user) return res.status(400).send('Invalid login details')
+    
+    const validatePassword = await bcrypt.compare(req.body.password, user.password)
+    if (!validatePassword) return res.status(400).send('Invalid login details')
+
+    const token = await user.generateToken()
+    console.log(token)
+    res.header('x-auth-token', token).send('Login Successfully')
+})
+
+router.post('/signup', async (req, res) => {
+
+    const { error } = validateUserRegistration(req.body)
+    
+    if (error) return res.status(400).send(error.details[0].message)
+
+    const email = await User.findOne({ email: req.body.email }).catch(err => console.log(err.message))
+    if(email) return res.status(400).send('User with the given email exist')
+    
+    let user = new User({username: req.body.username, email: req.body.email, password: req.body.password})
+
+
+    const salt = await bcrypt.genSalt(10);
+    const password = await bcrypt.hash(req.body.password, salt)
+    user.password = password
+    await user.save()
+
+    res.header('x-auth-token').send(_.pick(user, ['_id', 'email', 'username']))
     
 })
 

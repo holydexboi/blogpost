@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
+const config = require('config')
+const jwt = require('jsonwebtoken')
 
 // Define the Mongoose schema for the User collection
 const userSchema = new mongoose.Schema({
@@ -25,6 +27,11 @@ const userSchema = new mongoose.Schema({
   },
   // Add other user-related fields such as name, profile picture, etc.
 });
+
+userSchema.methods.generateToken = function () {
+    const token = jwt.sign({_id: this._id}, config.get('jwtPrivateKey'))
+    return token
+}
 
 // Create a Mongoose model for the User collection
 const User = mongoose.model("User", userSchema);
