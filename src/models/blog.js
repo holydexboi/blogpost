@@ -62,5 +62,20 @@ const validateBlogPost = (blogPost) => {
   return schema.validate(blogPost);
 };
 
+const validateUpdateBlogPost = (blogPost) => {
+    const schema = Joi.object({
+      title: Joi.string().min(5).max(255),
+      content: Joi.string(),
+      tags: Joi.array().items(Joi.string()).min(1),
+      featuredImage: Joi.string(),
+      status: Joi.string()
+        .valid("draft", "published", "archived")
+        .default("draft"),
+    });
+  
+    return schema.validate(blogPost);
+  };
+
 module.exports.BlogPost = BlogPost;
 module.exports.validateBlogPost = validateBlogPost;
+module.exports.validateUpdateBlogPost = validateUpdateBlogPost;
