@@ -7,6 +7,21 @@ const config = require('config')
 
 const router = express.Router()
 
+router.get('/', async (req, res) => {
+
+    const users = await User.find().catch(err => console.log(err.message))
+    res.send(users)
+})
+
+router.get('/:id', async (req, res) => {
+
+    const user = await User.findById(req.params.id).catch((err) => console.log(err.message))
+
+    if (!user) return res.status(404).send('No User with the given Id')
+    
+    res.send(_.pick(user, ['_id', 'email', 'username']))
+})
+
 router.post('/login', async (req, res) => {
 
     const { error } = validateUserLogin(req.body)
