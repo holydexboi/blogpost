@@ -60,7 +60,7 @@ router.put("/:id", auth, async (req, res) => {
       featuredImage: req.body.featuredImage,
     },
     { new: true }
-  ).catch(err => console.log(err.message));
+  ).catch((err) => console.log(err.message));
 
   if (!blog)
     return res.status(404).json({ error: "No blog with the given id" });
@@ -68,5 +68,17 @@ router.put("/:id", auth, async (req, res) => {
   res.send(blog);
 });
 
+router.delete("/:id", auth, async (req, res) => {
+  const blog = await BlogPost.findByIdAndRemove(req.params.id).catch((err) =>
+    console.log(err.message)
+  );
+
+  if (!blog)
+    return res
+      .status(404)
+      .json({ error: "No blog with the given Id or Can't delete the bblog" });
+
+  res.status(201).send("Deleted Successfully");
+});
 
 module.exports = router;
