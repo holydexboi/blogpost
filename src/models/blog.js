@@ -14,11 +14,10 @@ const blogPostSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  author: {
-    type: String,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Teacher",
     required: true,
-    trim: true,
-    maxlength: 50,
   },
   tags: {
     type: [String],
@@ -36,7 +35,7 @@ const blogPostSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  
+
   featuredImage: String,
   status: {
     type: String,
@@ -53,9 +52,8 @@ const validateBlogPost = (blogPost) => {
   const schema = Joi.object({
     title: Joi.string().min(5).max(255).required(),
     content: Joi.string().required(),
-    author: Joi.string().max(50).required(),
+    tags: Joi.array().items(Joi.string()).min(1).required(),
     featuredImage: Joi.string(),
-  
     status: Joi.string()
       .valid("draft", "published", "archived")
       .default("draft"),

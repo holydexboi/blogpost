@@ -7,12 +7,14 @@ require('express-async-errors')
 const app = express();
 const error = require("./middleware/error");
 const user = require("./routes/user");
+const blog = require('./routes/blog')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(error);
 app.use("/user", user);
+app.use("/blog", blog)
 
 mongoose.connect(config.get('MONGOURI'), { useNewUrlParser: true, useUnifiedTopology: true}).then(() =>  winston.info('Connected to database'))
 
